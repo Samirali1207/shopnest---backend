@@ -1,7 +1,6 @@
 const Order = require("../Models/order.js")
 const sendEmail = require("../utils/sendEmail.js")
 
-
 const createOrder = async (req, res) => {
     try {
         const { items, totalAmount, address, paymentId } = req.body;
@@ -22,6 +21,7 @@ const createOrder = async (req, res) => {
             await sendEmail(req.user.email, "Order created ", message)
             res.status(200).json({ message: "order created successfully ", order })
         }
+
     } catch (error) {
         console.log(error)
         return res.status(500).json({ message: "error creating order", error })

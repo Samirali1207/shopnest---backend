@@ -4,13 +4,13 @@ dotenv = require("dotenv").config()
 
 const createdOrder = async (req, res) => {
     try {
-        const instance = Razorpay({
+        const instance = new Razorpay({
             key_id: process.env.RAZORPAY_KEY_ID,
             key_secret: process.env.RAZORPAY_KEY_SECRET
         })
 
         const options = {
-            amount: req.body.ampont * 100,
+            amount: req.body.amount * 100,
             currency: "INR",
             receipt: crypto.randomBytes(10).toString("hex")
         }
@@ -20,7 +20,8 @@ const createdOrder = async (req, res) => {
         res.status(200).json(order)
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal server error " })
+        console.log(error.message)
+        return res.status(500).json({ message: "internal server error", error })
     }
 }
 
@@ -34,7 +35,10 @@ const verifyPayment = async (req, res) => {
             .digest("hex")
 
         if (generated_signature === razorpay_signature) {
-            res.status(200).json({ message: "Payment verified successfully " })
+            return res.status(200).json({
+                success: true,
+                message: "Payment verified successfully"
+            });
         }
         else {
             return res.status(401).json({ message: "Payment Not verified " })
@@ -45,4 +49,4 @@ const verifyPayment = async (req, res) => {
     }
 }
 
-module.exports = {createdOrder , verifyPayment}
+module.exports = { createdOrder, verifyPayment }
