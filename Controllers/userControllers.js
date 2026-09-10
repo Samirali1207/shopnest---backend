@@ -86,6 +86,42 @@ const verifyUser = async (req, res) => {
     }
 };
 
+// re-verify user 
+const reVerifyUser = async (req, res) => {
+
+    const { email } = req.body
+    try {
+
+        const user = await User.findOne({ email })
+        if (!user) {
+           return  res.status(400).json({ message: "User not found" })
+        }
+
+        if (user.isVerified) {
+           return  res.status(400).json({ message: "user already verified" })
+        }
+
+        const verificationToken = await crypto.randomBytes(10).toString("hex")
+
+        const message = `Welcome to Shopnest , ${user.name} ! Thank you for registering with us  we are 
+            excited , your verification Link  for Shopnest registration is ${process.env.FRONTEND_URL}/verify/${verificationToken}`
+
+        await sendEmail(email, 'Welcome to shopnest - Your link for email verification', message)
+
+        user.verificationToken = verificationToken
+        user.save()
+
+        res.status(200).json({
+            message: "verification link sent successfully",
+            verificationToken: verificationToken
+        })
+    } catch (error) {
+        res.status(500).json({ message: "internal server error" })
+    }
+
+
+}
+
 //  login user
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
@@ -140,4 +176,4 @@ const getUsers = async (req, res) => {
     }
 }
 
-module.exports = { registerUser, verifyUser, loginUser, getUsers }
+module.exports = { registerUser, verifyUser, loginUser, getUsers, reVerifyUser }
