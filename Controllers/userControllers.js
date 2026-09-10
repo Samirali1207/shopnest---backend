@@ -31,7 +31,7 @@ const registerUser = async (req, res) => {
 
             const message = `Welcome to Shopnest , ${name} ! Thank you for registering with us  we are 
             excited , your verification Link  for Shopnest registration is ${process.env.FRONTEND_URL}/verify/${verificationToken}`
-            
+
             user.verificationToken = verificationToken
             user.save()
 
@@ -43,8 +43,10 @@ const registerUser = async (req, res) => {
                 token: generateToken(user._id),
                 verificationToken: verificationToken
             })
+
+            await sendEmail(email, 'Welcome to shopnest - Your link for email verification', message)
         }
-        await sendEmail(email, 'Welcome to shopnest - Your link for email verification', message)
+
 
     } catch (error) {
         res.status(400).json({ message: "internal server error " })
