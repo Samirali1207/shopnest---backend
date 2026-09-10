@@ -31,10 +31,7 @@ const registerUser = async (req, res) => {
 
             const message = `Welcome to Shopnest , ${name} ! Thank you for registering with us  we are 
             excited , your verification Link  for Shopnest registration is ${process.env.FRONTEND_URL}/verify/${verificationToken}`
-
-
-            await sendEmail(email, 'Welcome to shopnest - Your link for email verification', message)
-
+            
             user.verificationToken = verificationToken
             user.save()
 
@@ -47,6 +44,7 @@ const registerUser = async (req, res) => {
                 verificationToken: verificationToken
             })
         }
+        await sendEmail(email, 'Welcome to shopnest - Your link for email verification', message)
 
     } catch (error) {
         res.status(400).json({ message: "internal server error " })
@@ -94,19 +92,17 @@ const reVerifyUser = async (req, res) => {
 
         const user = await User.findOne({ email })
         if (!user) {
-           return  res.status(400).json({ message: "User not found" })
+            return res.status(400).json({ message: "User not found" })
         }
 
         if (user.isVerified) {
-           return  res.status(400).json({ message: "user already verified" })
+            return res.status(400).json({ message: "user already verified" })
         }
 
         const verificationToken = await crypto.randomBytes(10).toString("hex")
 
         const message = `Welcome to Shopnest , ${user.name} ! Thank you for registering with us  we are 
             excited , your verification Link  for Shopnest registration is ${process.env.FRONTEND_URL}/verify/${verificationToken}`
-
-        await sendEmail(email, 'Welcome to shopnest - Your link for email verification', message)
 
         user.verificationToken = verificationToken
         user.save()
@@ -115,6 +111,7 @@ const reVerifyUser = async (req, res) => {
             message: "verification link sent successfully",
             verificationToken: verificationToken
         })
+        await sendEmail(email, 'Welcome to shopnest - Your link for email verification', message)
     } catch (error) {
         res.status(500).json({ message: "internal server error" })
     }
