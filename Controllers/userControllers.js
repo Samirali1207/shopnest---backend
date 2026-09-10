@@ -14,12 +14,10 @@ const generateToken = (id) => {
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
-    // HERE WE HAVE TO HASH THE PASSWORD SEND THE OTP FOR REGISTRATION AND EMAIL VERIFICATION
-
     try {
         const existingUser = await User.findOne({ email })
         if (existingUser) {
-            return res.status(400).json({ message: "User exists already" })
+            return res.status(409).json({ message: "User exists already" })
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -34,9 +32,8 @@ const registerUser = async (req, res) => {
             const message = `Welcome to Shopnest , ${name} ! Thank you for registering with us  we are 
             excited , your verification Link  for Shopnest registration is ${process.env.FRONTEND_URL}/verify/${verificationToken}`
 
-            console.log(process.env.FRONTEND_URL)
 
-            await sendEmail(email, 'Welcome to shopnest - Your otp for registration', message)
+            await sendEmail(email, 'Welcome to shopnest - Your link for email verification', message)
 
             user.verificationToken = verificationToken
             user.save()

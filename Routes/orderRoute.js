@@ -9,5 +9,4 @@ router.route("/").post(protect , createOrder).get(protect , admin , getAllOrders
 router.route("/myOrders").get(protect , myOrders)
 router.route("/:id/status").put(protect , admin ,  updateOrderStatus)
 
-
 module.exports = router
